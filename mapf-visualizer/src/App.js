@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Grid from "./Grid";
 import "./App.css";
@@ -12,37 +12,44 @@ function App() {
       .map(() => Array(cols).fill(0))
   );
 
-  // Start with one agent by default
   const [agents, setAgents] = useState([
     { id: 1, start: [0, 0], goal: [9, 9], color: "#007bff" },
   ]);
-
   const [selectedAgent, setSelectedAgent] = useState(1);
   const [paths, setPaths] = useState([]);
   const [animationPaths, setAnimationPaths] = useState([]);
   const [conflictMessage, setConflictMessage] = useState("");
   const [mode, setMode] = useState("obstacle");
-  const [animationIndex, setAnimationIndex] = useState(0); // Tracks animation progress
+  const [animationIndex, setAnimationIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [algoInfo, setAlgoInfo] = useState(""); // Algorithm details
-  const [conflictDetails, setConflictDetails] = useState([]); // Steps explaining conflict resolution
+  const [algoInfo, setAlgoInfo] = useState("No simulation run yet"); // Updated initial state
+  const [status, setStatus] = useState("No simulation run yet"); // Added status state
+  const [conflictDetails, setConflictDetails] = useState([]); // Conflict resolution steps
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("A*"); // Default to A*
 
-  // Add Agent Functionality
+  // Automatically update the algorithm based on the number of agents
+  useEffect(() => {
+    if (agents.length === 1) {
+      setSelectedAlgorithm("A*");
+    } else {
+      setSelectedAlgorithm("CBS");
+    }
+  }, [agents]);
+
   const addAgent = () => {
-    const newAgentId = agents.length + 1; // Unique agent ID
+    const newAgentId = agents.length + 1;
     setAgents([
       ...agents,
       {
         id: newAgentId,
-        start: [0, 0], // Default start position
-        goal: [rows - 1, cols - 1], // Default goal position
-        color: getRandomColor(), // Assign a random color
+        start: [0, 0],
+        goal: [rows - 1, cols - 1],
+        color: getRandomColor(),
       },
     ]);
-    setSelectedAgent(newAgentId); // Select the newly added agent
+    setSelectedAgent(newAgentId);
   };
 
-  // Remove Agent Functionality
   const removeAgent = () => {
     if (agents.length <= 1) {
       setConflictMessage("At least one agent must be present.");
@@ -50,12 +57,9 @@ function App() {
     }
     const updatedAgents = agents.filter((agent) => agent.id !== selectedAgent);
     setAgents(updatedAgents);
-
-    // Automatically select the first agent in the updated list
     setSelectedAgent(updatedAgents[0]?.id || 1);
   };
 
-  // Utility function to generate random colors for agents
   const getRandomColor = () => {
     const colors = ["#007bff", "#28a745", "#ffc107", "#ff6347", "#6c757d"];
     return colors[Math.floor(Math.random() * colors.length)];
@@ -95,43 +99,55 @@ function App() {
   const handleRunSimulation = async () => {
     try {
       setConflictMessage("");
+      setStatus("Running simulation...");
       setPaths([]);
       setAnimationPaths([]);
       setAnimationIndex(0);
       setIsAnimating(false);
-      setAlgoInfo("");
+      setAlgoInfo("Running simulation...");
       setConflictDetails([]);
-
+  
+      // Prepare obstacle data for backend
       const obstacles = gridData.reduce((acc, row, rowIndex) => {
         return acc.concat(
           row.map((cell, colIndex) => (cell === 1 ? [rowIndex, colIndex] : null)).filter(Boolean)
         );
       }, []);
-
+  
+      // Call backend
       const response = await axios.post("http://127.0.0.1:5000/solve", {
         rows,
         cols,
         obstacles,
         agents,
+        algorithm: selectedAlgorithm,
       });
-
-      const { paths, conflict, algoDetails, conflictSteps } = response.data;
-
+  
+      // Extract response details
+      const { paths, conflict, algoDetails, conflictMessage } = response.data;
+  
       setPaths(paths || []);
       setAlgoInfo(algoDetails || "Unknown Algorithm");
-      setConflictDetails(conflictSteps || []);
-
+  
       if (conflict) {
-        setConflictMessage("Conflict detected: Some agents could not find paths.");
+        // Display the specific conflict message from the backend
+        setConflictMessage(conflictMessage || "Conflict detected: Unable to calculate paths.");
+        setStatus(conflictMessage || "Conflict detected: Unable to calculate paths.");
       } else {
-        setConflictMessage("Paths calculated successfully!");
+        // Success scenario
+        setConflictMessage("");
+        setStatus("Paths calculated successfully!");
         animatePaths(paths); // Start animation
       }
     } catch (error) {
+      // Handle unexpected errors
       console.error("Error running simulation:", error);
-      setConflictMessage("An error occurred during simulation. Please try again.");
+      setConflictMessage("An error occurred during simulation.");
+      setStatus("Error occurred during simulation.");
+      setAlgoInfo("Error");
     }
   };
+  
 
   const animatePaths = (paths) => {
     setAnimationPaths(paths);
@@ -147,7 +163,7 @@ function App() {
       }
       setAnimationIndex(step);
       step += 1;
-    }, 500); // Adjust animation speed here (500ms per step)
+    }, 500);
   };
 
   const clearPaths = () => {
@@ -156,6 +172,8 @@ function App() {
     setAnimationIndex(0);
     setIsAnimating(false);
     setConflictMessage("");
+    setStatus("No simulation run yet");
+    setAlgoInfo("No simulation run yet");
   };
 
   const getModeMessage = () => {
@@ -173,43 +191,43 @@ function App() {
 
   return (
     <div className="container">
-      {/* Left Sidebar for Agent Controls */}
+      {/* Animated Background */}
+      <div className="gradient"></div>
       <div className="left-sidebar">
-      <h2>Agent Controls</h2>
-      <label htmlFor="agentSelect">Select Agent:</label>
-      <select
-        id="agentSelect"
-        onChange={(e) => setSelectedAgent(Number(e.target.value))}
-        value={selectedAgent}
-      >
-        {agents.map((agent) => (
-          <option key={agent.id} value={agent.id}>
-            Agent {agent.id}
-          </option>
-        ))}
-      </select>
+        <h2>Agent Controls</h2>
+        <label htmlFor="agentSelect">Select Agent:</label>
+        <select
+          id="agentSelect"
+          onChange={(e) => setSelectedAgent(Number(e.target.value))}
+          value={selectedAgent}
+        >
+          {agents.map((agent) => (
+            <option key={agent.id} value={agent.id}>
+              Agent {agent.id}
+            </option>
+          ))}
+        </select>
+        <button className="add-agent-btn" onClick={addAgent}>
+          Add Agent
+        </button>
+        <button
+          className="remove-agent-btn"
+          onClick={removeAgent}
+          disabled={agents.length <= 1}
+        >
+          Remove Agent
+        </button>
+      </div>
 
-      {/* Add Agent Button */}
-      <button 
-        className="add-agent-btn" // Add the class for blue styling
-        onClick={addAgent}
-      >
-        Add Agent
-      </button>
-
-      {/* Remove Agent Button */}
-      <button 
-        className="remove-agent-btn" // Add the class for red styling
-        onClick={removeAgent} 
-        disabled={agents.length <= 1}
-      >
-        Remove Agent
-      </button>
-    </div>
-
-      {/* Main Center Area */}
       <div className="App">
         <h1>Multi-Agent Pathfinding Visualizer</h1>
+        <div className="algorithm-select">
+          <label htmlFor="algorithm">Select Algorithm:</label>
+          <select id="algorithm" value={selectedAlgorithm} disabled>
+            <option value="CBS">Conflict-Based Search (CBS)</option>
+            <option value="A*">A* Algorithm</option>
+          </select>
+        </div>
         <div className="controls">
           <button
             className={mode === "obstacle" ? "active" : ""}
@@ -243,16 +261,54 @@ function App() {
           Run Simulation
         </button>
         <button onClick={clearPaths}>Clear Paths</button>
-        {conflictMessage && <p className="conflict-message">{conflictMessage}</p>}
       </div>
 
-      {/* Right Sidebar for Simulation Details */}
       <div className="sidebar">
         <h2>Simulation Details</h2>
         <p>
-          <strong>Algorithm Used:</strong> Conflict-Based Search (CBS)
+          <strong>Algorithm Used:</strong> {algoInfo}
         </p>
-        {conflictMessage && <p><strong>Status:</strong> {conflictMessage}</p>}
+        {status && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px",
+              backgroundColor: status.includes("Conflict")
+                ? "#fce8e6"
+                : status.includes("successfully")
+                ? "#e6f4ea"
+                : "#f0f0f0",
+              border: status.includes("Conflict")
+                ? "1px solid #d93025"
+                : status.includes("successfully")
+                ? "1px solid #34a853"
+                : "1px solid #ccc",
+              borderRadius: "8px",
+              color: status.includes("Conflict")
+                ? "#d93025"
+                : status.includes("successfully")
+                ? "#34a853"
+                : "#333",
+            }}
+          >
+            <strong>Status:</strong>
+            <span>{status}</span>
+            <span
+              style={{
+                fontSize: "1.5em",
+                color: status.includes("Conflict")
+                  ? "#d93025"
+                  : status.includes("successfully")
+                  ? "#34a853"
+                  : "#ccc",
+              }}
+            >
+              {status.includes("Conflict") ? "❌" : status.includes("successfully") ? "✔️" : ""}
+            </span>
+          </div>
+        )}
         <h3>Paths</h3>
         {paths.map((path, index) => (
           <p key={index}>
@@ -261,9 +317,7 @@ function App() {
         ))}
         <h3>Conflict Resolution</h3>
         {conflictDetails.length > 0 ? (
-          conflictDetails.map((detail, index) => (
-            <p key={index}>{detail}</p>
-          ))
+          conflictDetails.map((detail, index) => <p key={index}>{detail}</p>)
         ) : (
           <p>No conflicts detected.</p>
         )}

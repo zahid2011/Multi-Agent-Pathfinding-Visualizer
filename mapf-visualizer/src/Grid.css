@@ -49,3 +49,17 @@
   .cell.agent-2 {
     background-color: purple;
   }
+
+  .box {
+    font-size: 10px; /* Adjust to make the text smaller */
+    text-align: right;
+    vertical-align: bottom;
+    padding: 2px; /* Add some padding for spacing */
+    position: relative;
+}
+
+.box span {
+    position: absolute;
+    bottom: 2px; /* Adjust for fine-tuning */
+    right: 2px; /* Adjust for fine-tuning */
+}

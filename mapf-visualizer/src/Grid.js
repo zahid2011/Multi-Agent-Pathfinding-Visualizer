@@ -31,9 +31,14 @@ const Grid = ({ rows, cols, gridData, paths, onCellClick, agents }) => (
 
             if (isGoal) {
               content = `G${agentHere.id}`;
-              const isGoalReached = paths[agents.indexOf(agentHere)]?.some(
-                ([pathRow, pathCol]) => pathRow === rowIndex && pathCol === colIndex
-              );
+              const agentIndex = agents.indexOf(agentHere);
+              const isGoalReached =
+                Array.isArray(paths[agentIndex]) && paths[agentIndex].length
+                  ? paths[agentIndex].some(
+                      ([pathRow, pathCol]) =>
+                        pathRow === rowIndex && pathCol === colIndex
+                    )
+                  : false;
 
               if (isGoalReached) {
                 backgroundColor = agentHere.color; // Fill with color if goal is reached
@@ -60,7 +65,7 @@ const Grid = ({ rows, cols, gridData, paths, onCellClick, agents }) => (
 
           // Highlight path cells for different agents
           agents.forEach((agent, agentIndex) => {
-            const agentPath = paths[agentIndex] || [];
+            const agentPath = Array.isArray(paths[agentIndex]) ? paths[agentIndex] : []; // Ensure it's an array
             if (
               agentPath.some(
                 ([pathRow, pathCol]) =>

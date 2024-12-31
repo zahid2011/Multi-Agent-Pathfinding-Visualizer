@@ -301,3 +301,37 @@ button.active {
 .left-sidebar button.remove-agent-btn:hover {
   background-color: #c0392b; /* Darker red on hover */
 }
+
+.algorithm-select {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.algorithm-select label {
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #495057; /* Neutral dark gray */
+}
+
+.algorithm-select select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.9em;
+  background-color: #ffffff; /* Pure white */
+  color: #333333; /* Neutral dark gray */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: all 0.3s ease-in-out;
+}
+
+.algorithm-select select:focus {
+  border-color: #007bff; /* Blue border on focus */
+  outline: none;
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+

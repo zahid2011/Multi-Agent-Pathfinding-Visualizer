@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from cbs import cbs
 from grid import create_grid
+from a_star import a_star 
 
 app = Flask(__name__)
 CORS(app)
@@ -34,27 +35,40 @@ def solve_mapf():
             if "id" not in agent:
                 agent["id"] = index
 
-        # Log input data
-        print(f"Grid Dimensions: {rows}x{cols}")
-        print(f"Obstacles: {obstacles}")
-        print(f"Agents: {agents}")
-
         # Create grid
         grid = create_grid(rows, cols, obstacles)
-        print("Generated Grid:", grid)
 
-        # Calculate paths
+        # Decide which algorithm to use
+        algo_details = "Conflict-Based Search (CBS)" if len(agents) > 1 else "A* Algorithm"
         paths = cbs(grid, agents)
-        if not paths or any(len(path) == 0 for path in paths):
-            return jsonify({"paths": [], "conflict": True})
 
-        # Return successful response
-        return jsonify({"paths": paths, "conflict": False})
-    
+        # Analyze failure cases
+        if not paths or any(len(path) == 0 for path in paths):
+            blocked_agents = []
+            for i, agent in enumerate(agents):
+                if not paths or len(paths[i]) == 0:
+                    blocked_agents.append(f"Agent {agent['id']} is blocked.")
+
+            conflict_message = " ".join(blocked_agents) if blocked_agents else "Unable to calculate paths."
+            return jsonify({
+                "paths": [],
+                "conflict": True,
+                "algoDetails": algo_details,
+                "conflictMessage": conflict_message,
+            })
+
+        # Successful response
+        return jsonify({
+            "paths": paths,
+            "conflict": False,
+            "algoDetails": algo_details,
+            "conflictMessage": "Paths calculated successfully!",
+        })
+
     except Exception as e:
         # Catch unexpected errors
         print(f"Error: {e}")
-        return jsonify({"error": "An unexpected error occurred."}), 500
+        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
