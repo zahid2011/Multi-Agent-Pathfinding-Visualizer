@@ -1,0 +1,51 @@
+.grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .row {
+    display: flex;
+  }
+  
+  .cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    text-align: center;
+    line-height: 30px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white; /* Ensure text is visible on colored backgrounds */
+  }
+  
+  .cell.obstacle {
+    background-color: black;
+  }
+  
+  .cell.start {
+    background-color: green;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .cell.goal {
+    border-width: 2px;
+    border-radius: 4px; /* Optional: rounded corners for goal cells */
+  }
+  
+  .cell.goal:not(.filled) {
+    background-color: transparent; /* Keep it transparent until reached */
+    color: black; /* Make text visible when not filled */
+  }
+  .cell.agent-0 {
+    background-color: blue;
+  }
+  
+  .cell.agent-1 {
+    background-color: orange;
+  }
+  
+  .cell.agent-2 {
+    background-color: purple;
+  }
