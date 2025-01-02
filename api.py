@@ -2,7 +2,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from cbs import cbs
 from grid import create_grid
-from a_star import a_star 
+from a_star import a_star
+from dijkstra import dijkstra  # Import Dijkstra implementation
+from weighted_a_star import weighted_a_star  # Import Weighted A* implementation
+from greedy_best_first import greedy_best_first  # Import Greedy Best-First Search implementation
 
 app = Flask(__name__)
 CORS(app)
@@ -19,6 +22,8 @@ def solve_mapf():
         rows, cols = data["rows"], data["cols"]
         obstacles = data.get("obstacles", [])
         agents = data.get("agents", [])
+        algorithm = data.get("algorithm", "A*")  # Default to A* if no algorithm is provided
+        weight = data.get("weight", 1.0)  # Default weight for Weighted A*
 
         # Validate input data
         if not isinstance(rows, int) or not isinstance(cols, int):
@@ -38,16 +43,45 @@ def solve_mapf():
         # Create grid
         grid = create_grid(rows, cols, obstacles)
 
-        # Decide which algorithm to use
-        algo_details = "Conflict-Based Search (CBS)" if len(agents) > 1 else "A* Algorithm"
-        paths = cbs(grid, agents)
+        # Run the selected algorithm
+        paths = []
+        algo_details = ""
+
+        if algorithm == "Dijkstra":
+            algo_details = "Dijkstra's Algorithm"
+            paths = [
+                dijkstra(grid, agent["start"], agent["goal"])
+                for agent in agents
+            ]
+        elif algorithm == "A*":
+            algo_details = "A* Algorithm"
+            paths = [
+                a_star(grid, agent["start"], agent["goal"])
+                for agent in agents
+            ]
+        elif algorithm == "Weighted A*":
+            algo_details = f"Weighted A* (Weight={weight})"
+            paths = [
+                weighted_a_star(grid, agent["start"], agent["goal"], weight)
+                for agent in agents
+            ]
+        elif algorithm == "Greedy Best-First Search":
+            algo_details = "Greedy Best-First Search"
+            paths = [
+                greedy_best_first(grid, agent["start"], agent["goal"])
+                for agent in agents
+            ]
+        elif algorithm == "CBS":
+            algo_details = "Conflict-Based Search (CBS)"
+            paths = cbs(grid, agents)
+        else:
+            return jsonify({"error": "Unsupported algorithm."}), 400
 
         # Analyze failure cases
         if not paths or any(len(path) == 0 for path in paths):
-            blocked_agents = []
-            for i, agent in enumerate(agents):
-                if not paths or len(paths[i]) == 0:
-                    blocked_agents.append(f"Agent {agent['id']} is blocked.")
+            blocked_agents = [
+                f"Agent {agent['id']} is blocked." for i, agent in enumerate(agents) if not paths or len(paths[i]) == 0
+            ]
 
             conflict_message = " ".join(blocked_agents) if blocked_agents else "Unable to calculate paths."
             return jsonify({

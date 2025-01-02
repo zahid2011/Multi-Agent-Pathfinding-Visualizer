@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Grid from "./Grid";
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Legend, Title, Tooltip } from "chart.js";
 import "./App.css";
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
   const [status, setStatus] = useState("No simulation run yet"); // Added status state
   const [conflictDetails, setConflictDetails] = useState([]); // Conflict resolution steps
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("A*"); // Default to A*
+  const [selectedAlgorithms, setSelectedAlgorithms] = useState(["A*", "Dijkstra"]);
+  const [comparisonResults, setComparisonResults] = useState([]);
 
   // Automatically update the algorithm based on the number of agents
   useEffect(() => {
@@ -36,6 +40,30 @@ function App() {
     }
   }, [agents]);
 
+  const handleCompare = async () => {
+    try {
+      setConflictMessage("");
+      const obstacles = gridData.reduce((acc, row, rowIndex) => {
+        return acc.concat(
+          row.map((cell, colIndex) => (cell === 1 ? [rowIndex, colIndex] : null)).filter(Boolean)
+        );
+      }, []);
+  
+      const response = await axios.post("http://127.0.0.1:5000/solve", {
+        rows,
+        cols,
+        obstacles,
+        agents,
+        comparison: true,
+        algorithms: selectedAlgorithms,
+      });
+  
+      setComparisonResults(response.data.results || []);
+    } catch (error) {
+      console.error("Error comparing algorithms:", error);
+    }
+  };
+  
   const addAgent = () => {
     const newAgentId = agents.length + 1;
     setAgents([
@@ -189,6 +217,44 @@ function App() {
     }
   };
 
+  const animateComparison = () => {
+    setIsAnimating(true);
+    let step = 0;
+
+    const maxSteps = Math.max(
+      ...comparisonResults.map((result) => result.paths.map((path) => path.length))
+    );
+
+    const animationInterval = setInterval(() => {
+      if (step >= maxSteps) {
+        clearInterval(animationInterval);
+        setIsAnimating(false);
+        return;
+      }
+      setAnimationIndex(step);
+      step += 1;
+    }, 500);
+  };
+
+  const clearComparison = () => {
+    setComparisonResults([]);
+    setAnimationIndex(0);
+    setIsAnimating(false);
+  };
+
+  const chartData = {
+    labels: ["Execution Time", "Nodes Explored", "Path Length"],
+    datasets: comparisonResults.map((result, index) => ({
+      label: selectedAlgorithms[index],
+      data: [
+        result.stats.executionTime,
+        result.stats.nodesExplored,
+        result.stats.pathLength,
+      ],
+      backgroundColor: index === 0 ? "#007bff" : "#28a745",
+    })),
+  };
+
   return (
     <div className="container">
       {/* Animated Background */}
@@ -217,6 +283,37 @@ function App() {
         >
           Remove Agent
         </button>
+
+        <div className="comparison-sidebar">
+          <h2>Algorithm Comparison</h2>
+          <label>Select Algorithm 1:</label>
+          <select
+            value={selectedAlgorithms[0]}
+            onChange={(e) =>
+              setSelectedAlgorithms([e.target.value, selectedAlgorithms[1]])
+            }
+          >
+            <option value="A*">A*</option>
+            <option value="Dijkstra">Dijkstra</option>
+            <option value="Weighted A*">Weighted A*</option>
+            <option value="Greedy Best-First Search">Greedy Best-First</option>
+          </select>
+          <label>Select Algorithm 2:</label>
+          <select
+            value={selectedAlgorithms[1]}
+            onChange={(e) =>
+              setSelectedAlgorithms([selectedAlgorithms[0], e.target.value])
+            }
+          >
+            <option value="A*">A*</option>
+            <option value="Dijkstra">Dijkstra</option>
+            <option value="Weighted A*">Weighted A*</option>
+            <option value="Greedy Best-First Search">Greedy Best-First</option>
+          </select>
+          <button onClick={handleCompare} className="compare-btn">
+            Compare
+          </button>
+        </div>
       </div>
 
       <div className="App">
