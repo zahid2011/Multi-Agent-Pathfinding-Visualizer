@@ -1,7 +1,8 @@
 # Multi-Agent Pathfinding Visualizer
 This project, the **Multi-Agent Pathfinding Visualizer**, is an interactive tool designed to demonstrate and simulate various multi-agent pathfinding algorithms. It provides users with a graphical interface to visualize agents navigating through obstacles on a grid, allowing them to explore different algorithms and understand their behavior in resolving conflicts and finding optimal paths.
 
-[Project Demo]
+![multi-2](https://github.com/user-attachments/assets/20bd028a-e133-46e2-9f09-91114d705252)
+
 
 ---
 ## Table of Contents
