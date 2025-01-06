@@ -7,16 +7,15 @@ This project, the **Multi-Agent Pathfinding Visualizer**, is an interactive tool
 ---
 ## Table of Contents
 1. [Features](#features)
-2. [Screenshot](#screenshot)
-3. [Technologies Used](#technologies-used)
-4. [Installation](#installation)
+2. [Technologies Used](#technologies-used)
+3. [Installation](#installation)
    - [Prerequisites](#prerequisites)
    - [Steps](#steps)
    - [Install Dependencies](#install-dependencies)
    - [Run the Application](#run-the-application)
-5. [How to Use](#how-to-use)
-6. [Algorithms Explained](#algorithms-explained)
-7. [Contact](#contact)
+4. [How to Use](#how-to-use)
+5. [Algorithms Explained](#algorithms-explained)
+6. [Contact](#contact)
 
 ---
 ## Features
@@ -31,11 +30,6 @@ This project, the **Multi-Agent Pathfinding Visualizer**, is an interactive tool
 - **Conflict Detection**: Identify conflicts in agent paths and visualize resolution.
 - **Visualization**: Real-time animation of agents navigating through the grid.
 - **Responsive Design**: Intuitive and user-friendly interface.
-
----
-
-## Screenshot
-[Screenshot]
 
 ---
 
