@@ -30,4 +30,4 @@ def weighted_a_star(grid, start, goal, weight=1.0):
                 open_set.put((priority, neighbor))
                 came_from[neighbor] = current
 
-    return []  # Return an empty path if no path exists
+    return []  # Returns an empty path if no path exists

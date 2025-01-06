@@ -15,13 +15,13 @@ class GridEnv(gym.Env):
         nx, ny = self.agent["position"][0] + dx, self.agent["position"][1] + dy
 
         if 0 <= nx < self.grid.shape[0] and 0 <= ny < self.grid.shape[1]:
-            if self.grid[nx, ny] == 0:  # Not an obstacle
+            if self.grid[nx, ny] == 0: 
                 self.agent["position"] = (nx, ny)
                 reward = 1
                 done = self.agent["position"] == self.agent["goal"]
                 return self.grid, reward, done, {}
 
-        return self.grid, -1, False, {}  # Invalid move
+        return self.grid, -1, False, {} 
 
     def reset(self):
         self.agent["position"] = self.agent["start"]

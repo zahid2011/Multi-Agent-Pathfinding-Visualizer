@@ -7,11 +7,10 @@ const Grid = ({ rows, cols, gridData, paths, onCellClick, agents }) => (
       <div key={rowIndex} className="row">
         {row.map((cell, colIndex) => {
           let className = "cell";
-          let content = ""; // To display `S1`, `G1`, etc.
+          let content = ""; 
           let backgroundColor = ""; // Custom path color for agents
-          let borderColor = ""; // For goal borders before being reached
-
-          // Check if this cell is a start or goal for any agent
+          let borderColor = ""; 
+          // Checking if this cell is a start or goal for any agent
           const agentHere = agents.find(
             (agent) =>
               (rowIndex === agent.start[0] && colIndex === agent.start[1]) ||
@@ -26,9 +25,8 @@ const Grid = ({ rows, cols, gridData, paths, onCellClick, agents }) => (
 
             if (isStart) {
               content = `S${agentHere.id}`;
-              backgroundColor = agentHere.color; // Start is always filled with the agent color
+              backgroundColor = agentHere.color; 
             }
-
             if (isGoal) {
               content = `G${agentHere.id}`;
               const agentIndex = agents.indexOf(agentHere);
@@ -41,9 +39,9 @@ const Grid = ({ rows, cols, gridData, paths, onCellClick, agents }) => (
                   : false;
 
               if (isGoalReached) {
-                backgroundColor = agentHere.color; // Fill with color if goal is reached
+                backgroundColor = agentHere.color; 
               } else {
-                borderColor = agentHere.color; // Border color if not reached
+                borderColor = agentHere.color;
               }
             }
 
@@ -62,21 +60,17 @@ const Grid = ({ rows, cols, gridData, paths, onCellClick, agents }) => (
               </div>
             );
           }
-
-          // Highlight path cells for different agents
           agents.forEach((agent, agentIndex) => {
-            const agentPath = Array.isArray(paths[agentIndex]) ? paths[agentIndex] : []; // Ensure it's an array
+            const agentPath = Array.isArray(paths[agentIndex]) ? paths[agentIndex] : [];
             if (
               agentPath.some(
                 ([pathRow, pathCol]) =>
                   pathRow === rowIndex && pathCol === colIndex
               )
             ) {
-              backgroundColor = agent.color; // Use agent's assigned color for the path
+              backgroundColor = agent.color;
             }
           });
-
-          // Highlight obstacles
           if (cell === 1) {
             className += " obstacle";
           }

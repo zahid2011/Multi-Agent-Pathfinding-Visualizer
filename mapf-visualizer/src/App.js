@@ -1,13 +1,50 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Grid from "./Grid";
-import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Legend, Title, Tooltip } from "chart.js";
 import "./App.css";
 
 function App() {
   const [rows] = useState(10);
   const [cols] = useState(10);
+  const [gridSize, setGridSize] = useState({ rows: 10, cols: 10 });
+  const [isGridSizeLocked, setIsGridSizeLocked] = useState(false); 
+
+  const handleGridSizeChange = (e) => {
+    const { name, value } = e.target;
+    setGridSize({
+      ...gridSize,
+      [name]: value === "" ? "" : Number(value),
+    });
+  };
+
+  const applyGridSizeChange = () => {
+    if (!isAnimating) {
+      setPaths([]);
+      setAnimationPaths([]);
+      setAnimationIndex(0);
+      setAgents([
+        {
+          id: 1,
+          start: [0, 0],
+          goal: [gridSize.rows - 1, gridSize.cols - 1],
+          color: "#007bff",
+        },
+      ]);
+      setSelectedAgent(1);
+  
+      // Resetting the grid data
+      setGridData(
+        Array(gridSize.rows)
+          .fill(null)
+          .map(() => Array(gridSize.cols).fill(0))
+      );
+
+      setConflictMessage("");
+      setStatus("No simulation run yet");
+      setAlgoInfo("No simulation run yet");
+    }
+  };
+  
   const [gridData, setGridData] = useState(
     Array(rows)
       .fill(null)
@@ -24,12 +61,10 @@ function App() {
   const [mode, setMode] = useState("obstacle");
   const [animationIndex, setAnimationIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [algoInfo, setAlgoInfo] = useState("No simulation run yet"); // Updated initial state
-  const [status, setStatus] = useState("No simulation run yet"); // Added status state
-  const [conflictDetails, setConflictDetails] = useState([]); // Conflict resolution steps
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState("A*"); // Default to A*
-  const [selectedAlgorithms, setSelectedAlgorithms] = useState(["A*", "Dijkstra"]);
-  const [comparisonResults, setComparisonResults] = useState([]);
+  const [algoInfo, setAlgoInfo] = useState("No simulation run yet");
+  const [status, setStatus] = useState("No simulation run yet");
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("A*");
+  const [weight, setWeight] = useState(1.0);
 
   // Automatically update the algorithm based on the number of agents
   useEffect(() => {
@@ -40,30 +75,6 @@ function App() {
     }
   }, [agents]);
 
-  const handleCompare = async () => {
-    try {
-      setConflictMessage("");
-      const obstacles = gridData.reduce((acc, row, rowIndex) => {
-        return acc.concat(
-          row.map((cell, colIndex) => (cell === 1 ? [rowIndex, colIndex] : null)).filter(Boolean)
-        );
-      }, []);
-  
-      const response = await axios.post("http://127.0.0.1:5000/solve", {
-        rows,
-        cols,
-        obstacles,
-        agents,
-        comparison: true,
-        algorithms: selectedAlgorithms,
-      });
-  
-      setComparisonResults(response.data.results || []);
-    } catch (error) {
-      console.error("Error comparing algorithms:", error);
-    }
-  };
-  
   const addAgent = () => {
     const newAgentId = agents.length + 1;
     setAgents([
@@ -133,57 +144,59 @@ function App() {
       setAnimationIndex(0);
       setIsAnimating(false);
       setAlgoInfo("Running simulation...");
-      setConflictDetails([]);
-  
-      // Prepare obstacle data for backend
       const obstacles = gridData.reduce((acc, row, rowIndex) => {
         return acc.concat(
-          row.map((cell, colIndex) => (cell === 1 ? [rowIndex, colIndex] : null)).filter(Boolean)
+          row
+            .map((cell, colIndex) =>
+              cell === 1 ? [rowIndex, colIndex] : null
+            )
+            .filter(Boolean)
         );
       }, []);
-  
-      // Call backend
+
+      // Calling the backend
       const response = await axios.post("http://127.0.0.1:5000/solve", {
         rows,
         cols,
         obstacles,
         agents,
         algorithm: selectedAlgorithm,
+        weight: selectedAlgorithm === "Weighted A*" ? weight : undefined, 
       });
-  
+
       // Extract response details
       const { paths, conflict, algoDetails, conflictMessage } = response.data;
-  
+
       setPaths(paths || []);
       setAlgoInfo(algoDetails || "Unknown Algorithm");
-  
+
       if (conflict) {
-        // Display the specific conflict message from the backend
-        setConflictMessage(conflictMessage || "Conflict detected: Unable to calculate paths.");
-        setStatus(conflictMessage || "Conflict detected: Unable to calculate paths.");
+        setConflictMessage(
+          conflictMessage || "Conflict detected: Unable to calculate paths."
+        );
+        setStatus(
+          conflictMessage || "Conflict detected: Unable to calculate paths."
+        );
       } else {
-        // Success scenario
         setConflictMessage("");
         setStatus("Paths calculated successfully!");
-        animatePaths(paths); // Start animation
+        animatePaths(paths); // Starting animation
       }
     } catch (error) {
-      // Handle unexpected errors
       console.error("Error running simulation:", error);
       setConflictMessage("An error occurred during simulation.");
       setStatus("Error occurred during simulation.");
       setAlgoInfo("Error");
     }
   };
-  
 
   const animatePaths = (paths) => {
     setAnimationPaths(paths);
     setIsAnimating(true);
     let step = 0;
-
+  
     const maxSteps = Math.max(...paths.map((path) => path.length));
-    const animationInterval = setInterval(() => {
+    let animationInterval = setInterval(() => {
       if (step >= maxSteps) {
         clearInterval(animationInterval);
         setIsAnimating(false);
@@ -192,18 +205,23 @@ function App() {
       setAnimationIndex(step);
       step += 1;
     }, 500);
+  
+    
+    window.currentAnimationInterval = animationInterval;
   };
 
   const clearPaths = () => {
+    if (isAnimating) {
+      clearInterval(window.currentAnimationInterval); 
+      setIsAnimating(false);
+    }
     setPaths([]);
     setAnimationPaths([]);
     setAnimationIndex(0);
-    setIsAnimating(false);
     setConflictMessage("");
     setStatus("No simulation run yet");
     setAlgoInfo("No simulation run yet");
   };
-
   const getModeMessage = () => {
     switch (mode) {
       case "obstacle":
@@ -217,48 +235,8 @@ function App() {
     }
   };
 
-  const animateComparison = () => {
-    setIsAnimating(true);
-    let step = 0;
-
-    const maxSteps = Math.max(
-      ...comparisonResults.map((result) => result.paths.map((path) => path.length))
-    );
-
-    const animationInterval = setInterval(() => {
-      if (step >= maxSteps) {
-        clearInterval(animationInterval);
-        setIsAnimating(false);
-        return;
-      }
-      setAnimationIndex(step);
-      step += 1;
-    }, 500);
-  };
-
-  const clearComparison = () => {
-    setComparisonResults([]);
-    setAnimationIndex(0);
-    setIsAnimating(false);
-  };
-
-  const chartData = {
-    labels: ["Execution Time", "Nodes Explored", "Path Length"],
-    datasets: comparisonResults.map((result, index) => ({
-      label: selectedAlgorithms[index],
-      data: [
-        result.stats.executionTime,
-        result.stats.nodesExplored,
-        result.stats.pathLength,
-      ],
-      backgroundColor: index === 0 ? "#007bff" : "#28a745",
-    })),
-  };
-
   return (
     <div className="container">
-      {/* Animated Background */}
-      <div className="gradient"></div>
       <div className="left-sidebar">
         <h2>Agent Controls</h2>
         <label htmlFor="agentSelect">Select Agent:</label>
@@ -283,35 +261,38 @@ function App() {
         >
           Remove Agent
         </button>
-
-        <div className="comparison-sidebar">
-          <h2>Algorithm Comparison</h2>
-          <label>Select Algorithm 1:</label>
-          <select
-            value={selectedAlgorithms[0]}
-            onChange={(e) =>
-              setSelectedAlgorithms([e.target.value, selectedAlgorithms[1]])
-            }
+             
+        <div className="grid-size-box">
+          <h3>Change Grid Size</h3>
+          <label>
+            Rows:
+            <input
+              type="number"
+              name="rows"
+              min="2"
+              max="20"
+              value={gridSize.rows}
+              onChange={handleGridSizeChange}
+              disabled={isAnimating}
+            />
+          </label>
+          <label>
+            Columns:
+            <input
+              type="number"
+              name="cols"
+              min="2"
+              max="20"
+              value={gridSize.cols}
+              onChange={handleGridSizeChange}
+              disabled={isAnimating}
+            />
+          </label>
+          <button
+            onClick={applyGridSizeChange}
+            disabled={isAnimating || gridSize.rows < 2 || gridSize.cols < 2}
           >
-            <option value="A*">A*</option>
-            <option value="Dijkstra">Dijkstra</option>
-            <option value="Weighted A*">Weighted A*</option>
-            <option value="Greedy Best-First Search">Greedy Best-First</option>
-          </select>
-          <label>Select Algorithm 2:</label>
-          <select
-            value={selectedAlgorithms[1]}
-            onChange={(e) =>
-              setSelectedAlgorithms([selectedAlgorithms[0], e.target.value])
-            }
-          >
-            <option value="A*">A*</option>
-            <option value="Dijkstra">Dijkstra</option>
-            <option value="Weighted A*">Weighted A*</option>
-            <option value="Greedy Best-First Search">Greedy Best-First</option>
-          </select>
-          <button onClick={handleCompare} className="compare-btn">
-            Compare
+            Change Grid Size
           </button>
         </div>
       </div>
@@ -320,11 +301,32 @@ function App() {
         <h1>Multi-Agent Pathfinding Visualizer</h1>
         <div className="algorithm-select">
           <label htmlFor="algorithm">Select Algorithm:</label>
-          <select id="algorithm" value={selectedAlgorithm} disabled>
+          <select
+            id="algorithm"
+            value={selectedAlgorithm}
+            onChange={(e) => setSelectedAlgorithm(e.target.value)}
+          >
             <option value="CBS">Conflict-Based Search (CBS)</option>
             <option value="A*">A* Algorithm</option>
+            <option value="Dijkstra">Dijkstra</option>
+            <option value="Weighted A*">Weighted A*</option>
+            <option value="Greedy Best-First Search">Greedy Best-First</option>
           </select>
         </div>
+        {selectedAlgorithm === "Weighted A*" && (
+          <div className="weight-input">
+            <label htmlFor="weight">Enter Weight:</label>
+            <input
+              id="weight"
+              type="number"
+              step="0.1"
+              min="0"
+              value={weight}
+              onChange={(e) => setWeight(Number(e.target.value))}
+            />
+          </div>
+        )}
+
         <div className="controls">
           <button
             className={mode === "obstacle" ? "active" : ""}
@@ -351,7 +353,9 @@ function App() {
           cols={cols}
           onCellClick={handleCellClick}
           gridData={gridData}
-          paths={animationPaths.map((path) => path.slice(0, animationIndex + 1))}
+          paths={animationPaths.map((path) =>
+            path.slice(0, animationIndex + 1)
+          )}
           agents={agents}
         />
         <button onClick={handleRunSimulation} disabled={isAnimating}>
@@ -407,14 +411,36 @@ function App() {
           </div>
         )}
         <h3>Paths</h3>
-        {paths.map((path, index) => (
-          <p key={index}>
-            <strong>Agent {index + 1}:</strong> {JSON.stringify(path)}
-          </p>
-        ))}
+        {paths.length > 0 ? (
+          <div style={{ maxHeight: "200px", overflowY: "auto", padding: "10px", border: "1px solid #ccc", borderRadius: "8px" }}>
+            {paths.map((path, index) => (
+              <div
+                key={index}
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  margin: "5px 0",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <strong>Agent {index + 1}:</strong>
+                <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                  {path.map((step, stepIndex) => (
+                    <li key={stepIndex} style={{ fontSize: "0.9em" }}>
+                      {`[${step[0]}, ${step[1]}]`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No paths calculated yet.</p>
+        )}
         <h3>Conflict Resolution</h3>
-        {conflictDetails.length > 0 ? (
-          conflictDetails.map((detail, index) => <p key={index}>{detail}</p>)
+        {conflictMessage ? (
+          <p style={{ color: "#d93025" }}>{conflictMessage}</p>
         ) : (
           <p>No conflicts detected.</p>
         )}

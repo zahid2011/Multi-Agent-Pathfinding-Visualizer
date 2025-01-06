@@ -2,7 +2,7 @@ body {
   font-family: "Roboto", Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(to right, #f5f7fa, #e4ebf5); /* Subtle gradient */
+  background: linear-gradient(to right, #f5f7fa, #e4ebf5); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,10 +21,10 @@ body {
 
 .App {
   text-align: center;
-  background: linear-gradient(to bottom, #ffffff, #f8f9fc); /* Subtle gradient */
+  background: linear-gradient(to bottom, #ffffff, #f8f9fc); 
   padding: 20px;
   border-radius: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); 
   max-width: 600px;
   width: 100%;
   display: flex;
@@ -36,7 +36,7 @@ body {
 h1 {
   margin-bottom: 10px;
   font-size: 1.8em;
-  color: #333333; /* Professional dark gray */
+  color: #333333; 
   font-weight: bold;
 }
 
@@ -48,7 +48,7 @@ h1 {
 }
 
 button {
-  background-color: #6c757d; /* Neutral gray */
+  background-color: #6c757d; 
   color: #ffffff;
   border: none;
   padding: 8px 15px;
@@ -57,27 +57,27 @@ button {
   font-size: 0.9em;
   font-weight: bold;
   transition: all 0.3s ease-in-out;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Softer shadow */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); 
 }
 
 button:hover {
-  background-color: #495057; /* Slightly darker gray */
+  background-color: #495057; 
   transform: translateY(-1px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 button.active {
-  background-color: #007bff; /* Professional blue */
+  background-color: #007bff; 
   border: 2px solid #0056b3;
 }
 
 .grid {
   display: grid;
   gap: 3px;
-  background-color: #f1f3f5; /* Light gray for grid */
+  background-color: #f1f3f5; 
   padding: 10px;
   border-radius: 15px;
-  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.05); /* Softer inner shadow */
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.05); 
   width: fit-content;
 }
 
@@ -101,17 +101,17 @@ button.active {
 }
 
 .cell.start {
-  background-color: #007bff; /* Blue for start */
+  background-color: #007bff; 
   border: 1px solid #0056b3;
 }
 
 .cell.goal {
-  background-color: #28a745; /* Green for goal */
+  background-color: #28a745; 
   border: 1px solid #1c7c31;
 }
 
 .cell.path {
-  background-color: #ffc107; /* Yellow for path */
+  background-color: #ffc107; 
   border: 1px solid #d39e00;
 }
 
@@ -148,8 +148,8 @@ button.active {
 }
 
 .sidebar {
-  background: #ffffff; /* Pure white for sidebar */
-  color: #333333; /* Professional dark gray */
+  background: #ffffff; 
+  color: #333333;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
@@ -159,7 +159,7 @@ button.active {
 }
 
 .sidebar h2 {
-  color: #007bff; /* Blue for headings */
+  color: #007bff;
   font-size: 1.2em;
   margin-bottom: 10px;
 }
@@ -223,7 +223,7 @@ button.active {
 .left-sidebar h2 {
   font-size: 1.5em;
   margin-bottom: 15px;
-  color: #007bff; /* Blue to match the theme */
+  color: #007bff; 
 }
 
 .left-sidebar label {
@@ -266,7 +266,7 @@ button.active {
   cursor: not-allowed;
 }
 .left-sidebar button.add-agent-btn {
-  background-color: #007bff; /* Blue color for Add Agent */
+  background-color: #007bff;
   color: #ffffff;
   border: none;
   padding: 10px 15px;
@@ -280,12 +280,12 @@ button.active {
 }
 
 .left-sidebar button.add-agent-btn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3; 
 }
 
 /* Remove Agent Button - Red */
 .left-sidebar button.remove-agent-btn {
-  background-color: #ff6347; /* Red color for Remove Agent */
+  background-color: #ff6347; 
   color: #ffffff;
   border: none;
   padding: 10px 15px;
@@ -299,88 +299,111 @@ button.active {
 }
 
 .left-sidebar button.remove-agent-btn:hover {
-  background-color: #c0392b; /* Darker red on hover */
+  background-color: #c0392b; 
 }
 
-.algorithm-select {
-  margin-bottom: 15px;
+.weight-input {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 100%;
+  margin-bottom: 15px;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
-.algorithm-select label {
-  font-size: 0.9em;
+.weight-input label {
+  font-size: 0.95rem;
   font-weight: bold;
   margin-bottom: 5px;
-  color: #495057; /* Neutral dark gray */
+  color: #333;
 }
 
-.algorithm-select select {
-  width: 100%;
+.weight-input input {
+  width: 100px;
   padding: 8px;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 0.9em;
-  background-color: #ffffff; /* Pure white */
-  color: #333333; /* Neutral dark gray */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
 }
 
-.algorithm-select select:focus {
-  border-color: #007bff; /* Blue border on focus */
+.weight-input input:focus {
+  border-color: #007bff;
   outline: none;
   box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
 }
 
-.comparison-sidebar {
-  margin-top: 20px;
-  background-color: #ffffff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+.algorithm-select {
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+  gap: 10px; 
+  margin: 15px 0;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
-.comparison-sidebar h2 {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-  color: #007bff;
-}
-
-.comparison-sidebar label {
-  font-size: 0.9em;
+.algorithm-select label {
+  font-size: 1rem;
   font-weight: bold;
-  color: #495057;
-  margin-top: 10px;
+  color: #333;
+  white-space: nowrap; 
 }
 
-.comparison-sidebar select {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+.algorithm-select select {
+  width: 200px;
+  padding: 10px;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 0.9em;
-  background-color: #ffffff;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
 }
 
-.comparison-sidebar button.compare-btn {
-  width: 100%;
-  background-color: #007bff;
-  color: #ffffff;
+.algorithm-select select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+.grid-size-box {
+  margin-top: 20px;
   padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.grid-size-box h3 {
+  margin-top: 0;
+}
+
+.grid-size-box label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.grid-size-box input {
+  margin-left: 10px;
+  padding: 5px;
+  width: 50px;
+}
+
+.grid-size-box button {
+  margin-top: 10px;
+  padding: 10px 15px; 
+  background-color: #007bff; 
+  color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 0.9em;
-  font-weight: bold;
+  border-radius: 8px; 
+  font-size: 0.9em; 
+  font-weight: bold; 
   cursor: pointer;
+  width: 100%; 
   transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); 
 }
 
-.comparison-sidebar button.compare-btn:hover {
-  background-color: #0056b3;
+.grid-size-box button:hover {
+  background-color: #0056b3; 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
-

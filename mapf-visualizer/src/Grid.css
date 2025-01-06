@@ -16,7 +16,7 @@
     line-height: 30px;
     font-size: 0.8em;
     font-weight: bold;
-    color: white; /* Ensure text is visible on colored backgrounds */
+    color: white; 
   }
   
   .cell.obstacle {
@@ -31,12 +31,12 @@
   
   .cell.goal {
     border-width: 2px;
-    border-radius: 4px; /* Optional: rounded corners for goal cells */
+    border-radius: 4px; 
   }
   
   .cell.goal:not(.filled) {
-    background-color: transparent; /* Keep it transparent until reached */
-    color: black; /* Make text visible when not filled */
+    background-color: transparent; 
+    color: black; 
   }
   .cell.agent-0 {
     background-color: blue;
@@ -51,15 +51,15 @@
   }
 
   .box {
-    font-size: 10px; /* Adjust to make the text smaller */
+    font-size: 10px; 
     text-align: right;
     vertical-align: bottom;
-    padding: 2px; /* Add some padding for spacing */
+    padding: 2px; 
     position: relative;
 }
 
 .box span {
     position: absolute;
-    bottom: 2px; /* Adjust for fine-tuning */
-    right: 2px; /* Adjust for fine-tuning */
+    bottom: 2px; 
+    right: 2px; 
 }
