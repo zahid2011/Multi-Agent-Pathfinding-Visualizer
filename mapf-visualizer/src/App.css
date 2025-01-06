@@ -149,13 +149,12 @@ button.active {
 }
 
 .sidebar {
+  width: 500px !important; /* Increase the width here */
   background: #ffffff; 
   color: #333333;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  max-width: 450px;
-  width: 100%;
   font-size: 0.9em;
   border: 2px solid #007bff;
 }
@@ -214,7 +213,7 @@ button.active {
 }
 
 .left-sidebar {
-  width: 300px;
+  width: 500px !important;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;

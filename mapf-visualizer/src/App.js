@@ -392,6 +392,7 @@ function App() {
                 : status.includes("successfully")
                 ? "#34a853"
                 : "#333",
+              
             }}
           >
             <strong>Status:</strong>
