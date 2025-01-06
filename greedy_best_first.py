@@ -25,8 +25,8 @@ def greedy_best_first(grid, start, goal):
             if neighbor in visited or grid[neighbor] == 1:
                 continue
             visited.add(neighbor)
-            priority = heuristic(tuple(goal), neighbor)  # Only heuristic, no cost-so-far
+            priority = heuristic(tuple(goal), neighbor)  
             open_set.put((priority, neighbor))
             came_from[neighbor] = current
 
-    return []  # Return an empty path if no path exists
+    return [] 

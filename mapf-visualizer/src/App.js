@@ -404,6 +404,7 @@ function App() {
                   : status.includes("successfully")
                   ? "#34a853"
                   : "#ccc",
+                  
               }}
             >
               {status.includes("Conflict") ? "❌" : status.includes("successfully") ? "✔️" : ""}
@@ -444,6 +445,25 @@ function App() {
         ) : (
           <p>No conflicts detected.</p>
         )}
+
+        <div className="about-me">
+            <h3>About Me</h3>
+            <p>
+              Hi, I'm a developer passionate about multi-agent systems and pathfinding. Check out my work on GitHub
+            </p>
+            <a
+              href="https://github.com/zahid2011"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="github-link"
+            >
+              <img
+                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                alt="GitHub Logo"
+              />
+              <span>GitHub</span>
+            </a>
+          </div>
       </div>
     </div>
   );
