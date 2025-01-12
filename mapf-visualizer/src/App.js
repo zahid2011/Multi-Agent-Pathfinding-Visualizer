@@ -358,10 +358,22 @@ function App() {
           )}
           agents={agents}
         />
-        <button onClick={handleRunSimulation} disabled={isAnimating}>
-          Run Simulation
-        </button>
-        <button onClick={clearPaths}>Clear Paths</button>
+        <div className="button-container">
+          <button
+            className="run-simulation"
+            onClick={handleRunSimulation}
+            disabled={isAnimating}
+          >
+            Run Simulation
+          </button>
+
+          <button
+            className="clear-paths"
+            onClick={clearPaths}
+          >
+            Clear Paths
+          </button>
+        </div>
       </div>
 
       <div className="sidebar">

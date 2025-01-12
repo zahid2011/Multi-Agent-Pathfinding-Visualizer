@@ -82,6 +82,49 @@ button.active {
   width: fit-content;
 }
 
+
+.button-container {
+  display: flex;
+  gap: 20px; /* Space between buttons */
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+/* Style for Run Simulation button */
+.run-simulation {
+  background-color: #007bff; /* Blue */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.run-simulation:hover {
+  background-color: #0056b3;
+}
+
+/* Style for Clear Paths button */
+.clear-paths {
+  background-color: #dc3545; /* Red */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.clear-paths:hover {
+  background-color: #c82333;
+}
+
+
 .cell {
   width: 30px;
   height: 30px;
@@ -149,15 +192,17 @@ button.active {
 }
 
 .sidebar {
-  width: 500px !important; /* Increase the width here */
+  width: 830px !important; 
   background: #ffffff; 
   color: #333333;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  font-size: 0.9em;
+  font-size: 1.0em;
   border: 2px solid #007bff;
 }
+
+
 
 .sidebar h2 {
   color: #007bff;
@@ -213,7 +258,7 @@ button.active {
 }
 
 .left-sidebar {
-  width: 500px !important;
+  width: 722px !important;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;
